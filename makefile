@@ -3,8 +3,8 @@
 #################
 
 # files
-EXECUTABLE  = words
-SOURCES  = words.c 
+EXECUTABLE  =pwords
+SOURCES  =pwords.c
 
 OBJECTS  = $(SOURCES:.c=.o)
 
@@ -12,7 +12,7 @@ OBJECTS  = $(SOURCES:.c=.o)
 CC      = gcc
 CFLAGS  = -c -std=c99 -D_GNU_SOURCE
 LDFLAGS = -lpthread
-WARN    = -Wall -Wextra -pedantic
+WARN    = -w
 COMPILE.c = $(CC) $(CFLAGS) $(CPPFLAGS) $(WARN)
 LINK.c    = $(CC)
 
