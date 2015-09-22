@@ -5,6 +5,7 @@
 #include <pthread.h>
 
 #define MAXWORD 1024
+#define noThreats 4  
 
 typedef struct dict {
   char *word;
@@ -80,17 +81,27 @@ int get_word( char *buf, int n, FILE *infile) {
 void *words( FILE *infile ) {
   d = NULL;
   char wordbuf[MAXWORD];
-  while( get_word( wordbuf, MAXWORD, infile ) ) {
+
+  pthread_mutex_lock(&lock);
+  int have_words = get_word( wordbuf, MAXWORD, infile );
+  pthread_mutex_unlock(&lock);
+
+
+  while( have_words ) {
 	 pthread_mutex_lock(&lock);
  	// add word to dictinonary
     	d = insert_word(d, wordbuf); 
   	pthread_mutex_unlock(&lock);
+	
+	pthread_mutex_lock(&lock);
+	have_words = get_word( wordbuf, MAXWORD, infile );
+	pthread_mutex_unlock(&lock);
   }
 }
 
 int main( int argc, char *argv[] ) {
 
-pthread_t threads[4];
+pthread_t threads[noThreats];
 
 	if(pthread_mutex_init(&lock,NULL)!=0)
 	{
@@ -109,12 +120,12 @@ pthread_t threads[4];
   	}
 
 int k;
-for( k = 0; k <= 4; k++ ){
+for( k = 0; k <= noThreats; k++ ){
 	pthread_create( &threads[k], NULL,&words, infile );
 }
 
 int j;
-for( j = 0; j <= 4; j++ ){
+for( j = 0; j <= noThreats; j++ ){
 	pthread_join( threads[j], NULL );
 }
 	print_dict(d);
