@@ -5,7 +5,7 @@
 #include <pthread.h>
 
 #define MAXWORD 1024
-#define noThreats 4  
+#define numThreads 4  
 
 typedef struct dict {
   char *word;
@@ -101,7 +101,7 @@ void *words( FILE *infile ) {
 
 int main( int argc, char *argv[] ) {
 
-pthread_t threads[noThreats];
+pthread_t threads[numThreads];
 
 	if(pthread_mutex_init(&lock,NULL)!=0)
 	{
@@ -118,17 +118,19 @@ pthread_t threads[noThreats];
     		printf("Unable to open %s\n",argv[1]);
     		exit( EXIT_FAILURE );
   	}
-
+//creating threads
 int k;
-for( k = 0; k <= noThreats; k++ ){
+for( k = 0; k <= numThreads; k++ ){
 	pthread_create( &threads[k], NULL,&words, infile );
 }
 
+//block until all threads complete
 int j;
-for( j = 0; j <= noThreats; j++ ){
+for( j = 0; j <= numThreads; j++ ){
 	pthread_join( threads[j], NULL );
 }
 	print_dict(d);
 	pthread_mutex_destroy(&lock);
   	fclose( infile );
+  	return EXIT_SUCCESS;
 }
